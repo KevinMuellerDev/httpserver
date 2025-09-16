@@ -1,27 +1,39 @@
 import { Request, Response, NextFunction } from "express";
 
+type resBody = {
+    body: string;
+}
 
-export const handlerValidateChirp = (req: Request, res: Response, next: NextFunction) => {
-    let body = "";
-    let stringifiedResponse = "";
+const profanityList = ['kerfuffle', 'sharbert', 'fornax']
 
-    req.on("data", (chunk) => {
-        body += chunk;
-    });
+const checkForProfane = (body: resBody) => {
 
-    req.on("end", () => {
-        res.header('Content-Type', 'application/json');
-        try {
-            const parsedBody = JSON.parse(body);
-            if (parsedBody.body.length > 140) {
-                stringifiedResponse = JSON.stringify({ error: "Chirp is too long" })
-                res.status(400).send(stringifiedResponse)
-            } else {
-                stringifiedResponse = JSON.stringify({ valid: true })
-                res.status(200).send(stringifiedResponse);
-            }
-        } catch (error) {
-            res.status(400).send({ error: "Something went wrong" })
+    profanityList.forEach((profanity) => {
+        if (body.body.toLocaleLowerCase().includes(profanity)) {
+            const words = body.body.split(' ');
+            const cleanedWords = words.map(word =>
+                word.toLocaleLowerCase() === profanity ? '****' : word
+            );
+            body.body = cleanedWords.join(' ');
         }
     })
+
+
+    return { cleanedBody: body.body }
+}
+
+
+export const handlerValidateChirp = (req: Request, res: Response, next: NextFunction) => {
+
+    try {
+        if (req.body.body.length > 140) {
+            res.status(400).send({ error: "Chirp is too long" })
+        } else {
+            const cleanedBody = checkForProfane(req.body);
+            res.status(200).send(cleanedBody);
+        }
+    } catch (error) {
+        res.status(400).send({ error: "Something went wrong" })
+    }
+
 }
