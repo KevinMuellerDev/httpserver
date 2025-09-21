@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { BadRequestError } from "./errors.js";
 
 type resBody = {
     body: string;
@@ -23,17 +24,17 @@ const checkForProfane = (body: resBody) => {
 }
 
 
-export const handlerValidateChirp = (req: Request, res: Response, next: NextFunction) => {
+export const handlerValidateChirp = async (req: Request, res: Response, next: NextFunction) => {
 
     try {
         if (req.body.body.length > 140) {
-            res.status(400).send({ error: "Chirp is too long" })
+            throw new BadRequestError("test");
         } else {
             const cleanedBody = checkForProfane(req.body);
             res.status(200).send(cleanedBody);
         }
     } catch (error) {
-        res.status(400).send({ error: "Something went wrong" })
+        next(error);
     }
 
 }

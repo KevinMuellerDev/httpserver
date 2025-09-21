@@ -1,5 +1,5 @@
 import express from "express";
-import { middlewareLogResponses, middlewareMetricsInc } from "./api/middleware.js";
+import { errorHandler, middlewareLogResponses, middlewareMetricsInc } from "./api/middleware.js";
 import { handlerReset } from "./api/reset.js";
 import { handlerMetrics } from "./api/metrics.js";
 import { handlerReadiness } from "./api/readiness.js";
@@ -18,6 +18,8 @@ app.get('/api/healthz', handlerReadiness);
 app.post('/api/validate_chirp', handlerValidateChirp);
 app.get('/admin/metrics', handlerMetrics);
 app.post('/admin/reset', handlerReset);
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
