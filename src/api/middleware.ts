@@ -15,7 +15,7 @@ export const middlewareLogResponses: Middleware = (req, res, next) => {
 };
 
 export const middlewareMetricsInc: Middleware = (req, res, next) => {
-    config.fileserverHits++
+    config.api.fileserverHits++
     next();
 }
 
