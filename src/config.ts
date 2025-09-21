@@ -8,6 +8,7 @@ type Config = {
 type APIConfig = {
   fileserverHits: number;
   port: number;
+  platform: string;
 };
 
 type DBConfig = {
@@ -15,7 +16,9 @@ type DBConfig = {
   migrationConfig: MigrationConfig;
 };
 
-const getEnvOrThrow = (key: string) => {
+process.loadEnvFile();
+
+export const getEnvOrThrow = (key: string) => {
   const env = process.env[key];
   if (!env) throw new Error("Environment variable not found.");
   return env;
@@ -29,6 +32,7 @@ export const config: Config = {
   api: {
     fileserverHits: 0,
     port: Number(getEnvOrThrow("PORT")),
+    platform: getEnvOrThrow("PLATFORM")
   },
   db: {
     url: getEnvOrThrow("DB_URL"),

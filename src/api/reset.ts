@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { config } from "../config.js";
+import { ForbiddenError } from "./errors.js";
+import { deleteUsers } from "../db/queries/users.js";
 
 export const handlerReset = async (
   req: Request,
@@ -8,11 +10,13 @@ export const handlerReset = async (
 ) => {
   try {
     config.api.fileserverHits = 0;
-    res.set({
-      "Content-Type": "text/plain",
-    });
-    res.write("Hits have been reset to 0");
-    res.end();
+
+
+    if (config.api.platform !== "dev")
+      throw new ForbiddenError("Reset is only allowed in dev environment.");
+
+    await deleteUsers();
+    res.status(200).json({ ok: true })
   } catch (error) {
     next(error);
   }
