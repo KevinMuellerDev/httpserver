@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { getEnvOrThrow } from "../config.js";
-import { createUser, deleteUsers } from "../db/queries/users.js";
-import { ForbiddenError } from "./errors.js";
+import { createUser } from "../db/queries/users.js";
+
 
 export const handlerCreateUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -9,7 +8,6 @@ export const handlerCreateUser = async (req: Request, res: Response, next: NextF
             throw new Error('')
 
         const newUser = await createUser(req.body);
-        console.table(newUser)
         res.status(201).json(newUser);
     } catch (error) {
         next(error);
