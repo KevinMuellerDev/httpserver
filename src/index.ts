@@ -13,6 +13,7 @@ import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { config } from "./config.js";
 import { handlerCreateUser } from "./api/users.js";
+import { handlerLogin } from "./api/login.js";
 
 const migrationClient = postgres(config.db.url, { max: 1 });
 await migrate(drizzle(migrationClient), config.db.migrationConfig);
@@ -24,8 +25,9 @@ app.use(middlewareLogResponses);
 app.use("/app", middlewareMetricsInc, express.static("./src/app"));
 
 app.get("/api/healthz", handlerReadiness);
-app.get("/api/chirps", handlerGetChirps)
-app.get("/api/chirps/:chirpID", handlerGetSingleChirp)
+app.get("/api/chirps", handlerGetChirps);
+app.get("/api/chirps/:chirpID", handlerGetSingleChirp);
+app.post("/api/login", handlerLogin);
 app.post("/api/chirps", handlerCreateChirp);
 app.post("/api/users", handlerCreateUser);
 
