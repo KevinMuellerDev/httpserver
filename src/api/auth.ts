@@ -1,6 +1,13 @@
 import { compare, genSalt, hash } from "bcrypt"
-import { getEnvOrThrow } from "../config.js";
-import { JwtPayload, sign, verify } from 'jsonwebtoken'
+import { config, getEnvOrThrow } from "../config.js";
+import type { JwtPayload } from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
+import { Request } from "express";
+import { UnauthorizedError } from "./errors.js";
+import { randomBytes } from "crypto";
+import { daysToMilliseconds } from "../db/utilities.js";
+import { createRefreshToken } from "../db/queries/refreshToken.js";
+import { RefreshToken } from "../db/schema.js";
 
 export const hashPassword = async (password: string): Promise<string> => {
     try {
@@ -39,7 +46,7 @@ export const makeJWT = (userID: string, expiresIn: number, secret: string): stri
             iat,
             exp: iat + expiresIn
         }
-        const token = sign(payload, secret)
+        const token = jwt.sign(payload, secret)
 
         return token
     } catch (error) {
@@ -49,12 +56,39 @@ export const makeJWT = (userID: string, expiresIn: number, secret: string): stri
 
 export const validateJWT = (tokenString: string, secret: string): string => {
     try {
-        const verification = verify(tokenString, secret);
+        const verification = jwt.verify(tokenString, secret);
         if (typeof (verification) === "string" || !verification.sub)
             throw new Error('JWTPayload is awaited')
 
         return verification.sub
     } catch (error) {
-        throw new Error('Something went wrong')
+        throw new UnauthorizedError('Something went wrong')
     }
+}
+
+
+export const getBearerToken = (req: Request): string => {
+    const bearer = req.get('Authorization')?.split(' ')[1];
+
+    if (!bearer)
+        throw new UnauthorizedError('')
+
+    return bearer
+}
+
+export const makeRefreshToken = async (id: string) => {
+    const randString = randomBytes(256).toString('hex');
+    const expirationInMs = new Date().getTime() + daysToMilliseconds(config.jwt.ttl);
+    const expirationDate = new Date(expirationInMs);
+
+    const refreshTokenData: RefreshToken = {
+        token: randString,
+        userId: id,
+        expiresAt: expirationDate
+    }
+
+    const token = await createRefreshToken(refreshTokenData);
+
+
+    return token.token
 }

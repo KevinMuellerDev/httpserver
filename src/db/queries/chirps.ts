@@ -13,15 +13,13 @@ export async function createChirp(chirp: Chirp) {
 }
 
 export async function getChirps() {
-    const result = await db.select().from(chirps).orderBy(asc(chirps.createdAt))
-    console.table(result);
+    const result = await db.select().from(chirps).orderBy(asc(chirps.createdAt));
 
     return result
 }
 
 export async function getSingleChirp(id: string) {
     const [result] = await db.select().from(chirps).where(eq(chirps.id, id));
-    console.table(result);
 
     return result
 }

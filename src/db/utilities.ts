@@ -11,3 +11,7 @@ export const transformUserData = (user: NewUser): UserWithoutHash => {
         updatedAt: user.updatedAt
     }
 }
+
+export const daysToMilliseconds = (days: string) => {
+    return (parseInt(days) * 24 * 60 * 60 * 1000)
+}

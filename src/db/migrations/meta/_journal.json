@@ -22,6 +22,13 @@
       "when": 1758641981328,
       "tag": "0002_pretty_wolfsbane",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1758723930224,
+      "tag": "0003_wise_nightcrawler",
+      "breakpoints": true
     }
   ]
 }

@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { BadRequestError } from "./errors.js";
 import { createChirp, getChirps, getSingleChirp } from "../db/queries/chirps.js";
+import { getBearerToken, validateJWT } from "./auth.js";
+import { config } from "../config.js";
+import { getUserByMail } from "src/db/queries/users.js";
 
 type resBody = {
     body: string;
@@ -27,15 +30,22 @@ const checkForProfane = (body: resBody) => {
 
 export const handlerCreateChirp = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        if (req.body.body.length > 140) {
-            throw new BadRequestError("test");
-        } else {
-            req.body.body = checkForProfane(req.body);
-            console.log(req.body.body)
-            const newChirp = await createChirp(req.body);
+        const token = getBearerToken(req);
+        const user = validateJWT(token, config.jwt.secret);
 
-            res.status(201).json(newChirp);
-        }
+
+        const body = req.body
+        body.userId = user;
+
+        if (body.body.length > 140)
+            throw new BadRequestError("test");
+
+        body.body = checkForProfane(body);
+
+        const newChirp = await createChirp(body);
+
+        res.status(201).json(newChirp);
+
     } catch (error) {
         next(error);
     }
