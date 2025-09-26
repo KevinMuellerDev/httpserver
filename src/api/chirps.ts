@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import { BadRequestError } from "./errors.js";
-import { createChirp, getChirps, getSingleChirp } from "../db/queries/chirps.js";
+import { BadRequestError, ForbiddenError, NotFoundError } from "./errors.js";
+import { createChirp, deleteSingleChirp, getChirps, getSingleChirp } from "../db/queries/chirps.js";
 import { getBearerToken, validateJWT } from "./auth.js";
 import { config } from "../config.js";
-import { getUserByMail } from "src/db/queries/users.js";
+
 
 type resBody = {
     body: string;
@@ -65,8 +65,36 @@ export const handlerGetSingleChirp = async (req: Request, res: Response, next: N
         const param = req.params.chirpID;
         const chirp = await getSingleChirp(param);
 
+        if (!chirp)
+            throw new NotFoundError('');
+
         res.status(200).json(chirp);
     } catch (error) {
         res.status(404).send("Chirp not found");
+    }
+}
+
+export const handlerDeleteSingleChirp = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const param = req.params.chirpID;
+        const token = getBearerToken(req);
+        const validatedUser = validateJWT(token, config.jwt.secret)
+
+        const singleChirp = await getSingleChirp(param)
+
+        if (singleChirp.userId !== validatedUser)
+            throw new ForbiddenError('');
+
+        const deletedChirp = await deleteSingleChirp(param);
+
+        console.table(deletedChirp)
+
+        if (!deletedChirp.body)
+            throw new NotFoundError('');
+
+        res.status(204).json({ ok: true })
+
+    } catch (error) {
+        next(error);
     }
 }

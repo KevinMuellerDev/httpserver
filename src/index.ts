@@ -7,12 +7,12 @@ import {
 import { handlerReset } from "./api/reset.js";
 import { handlerMetrics } from "./api/metrics.js";
 import { handlerReadiness } from "./api/readiness.js";
-import { handlerCreateChirp, handlerGetChirps, handlerGetSingleChirp } from "./api/chirps.js";
+import { handlerCreateChirp, handlerDeleteSingleChirp, handlerGetChirps, handlerGetSingleChirp } from "./api/chirps.js";
 import postgres from "postgres";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { config } from "./config.js";
-import { handlerCreateUser } from "./api/users.js";
+import { handlerPutUser, handlerCreateUser } from "./api/users.js";
 import { handlerLogin } from "./api/login.js";
 import { handlerRefreshToken } from "./api/refresh.js";
 import { handlerRevokeToken } from "./api/revoke.js";
@@ -29,11 +29,13 @@ app.use("/app", middlewareMetricsInc, express.static("./src/app"));
 app.get("/api/healthz", handlerReadiness);
 app.get("/api/chirps", handlerGetChirps);
 app.get("/api/chirps/:chirpID", handlerGetSingleChirp);
+app.delete("/api/chirps/:chirpID", handlerDeleteSingleChirp);
 app.post("/api/login", handlerLogin);
 app.post("/api/refresh", handlerRefreshToken);
 app.post("/api/revoke", handlerRevokeToken);
 app.post("/api/chirps", handlerCreateChirp);
 app.post("/api/users", handlerCreateUser);
+app.put("/api/users", handlerPutUser);
 
 app.get("/admin/metrics", handlerMetrics);
 app.post("/admin/reset", handlerReset);
