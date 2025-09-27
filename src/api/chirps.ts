@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { BadRequestError, ForbiddenError, NotFoundError } from "./errors.js";
-import { createChirp, deleteSingleChirp, getChirps, getSingleChirp } from "../db/queries/chirps.js";
+import { createChirp, deleteSingleChirp, getChirpsAsc, getChirpsDesc, getChirpsFromAuthor, getSingleChirp } from "../db/queries/chirps.js";
 import { getBearerToken, validateJWT } from "./auth.js";
 import { config } from "../config.js";
+import { Chirp } from "../db/schema.js";
 
 
 type resBody = {
@@ -51,9 +52,22 @@ export const handlerCreateChirp = async (req: Request, res: Response, next: Next
     }
 }
 
-export const handlerGetChirps = async (_: Request, res: Response, next: NextFunction) => {
+export const handlerGetChirps = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const chirps = await getChirps();
+        const authorId = req.query.authorId;
+        const sort = req.query.sort;
+
+        let chirps: Chirp[] = [];
+
+        if (authorId !== undefined && typeof (authorId) === "string") {
+            chirps = await getChirpsFromAuthor(authorId);
+        } else if (sort !== undefined && sort === "desc") {
+            chirps = await getChirpsDesc();
+        } else {
+            chirps = await getChirpsAsc();
+        }
+        console.log()
+
         res.status(200).json(chirps);
     } catch (error) {
         next(error);
