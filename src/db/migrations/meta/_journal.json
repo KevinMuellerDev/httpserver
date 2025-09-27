@@ -29,6 +29,13 @@
       "when": 1758723930224,
       "tag": "0003_wise_nightcrawler",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1758979141805,
+      "tag": "0004_stale_revanche",
+      "breakpoints": true
     }
   ]
 }

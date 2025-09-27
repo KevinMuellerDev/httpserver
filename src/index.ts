@@ -16,6 +16,7 @@ import { handlerPutUser, handlerCreateUser } from "./api/users.js";
 import { handlerLogin } from "./api/login.js";
 import { handlerRefreshToken } from "./api/refresh.js";
 import { handlerRevokeToken } from "./api/revoke.js";
+import { handlerSetChirpyRed } from "./api/webhooks.js";
 
 const migrationClient = postgres(config.db.url, { max: 1 });
 await migrate(drizzle(migrationClient), config.db.migrationConfig);
@@ -36,6 +37,7 @@ app.post("/api/revoke", handlerRevokeToken);
 app.post("/api/chirps", handlerCreateChirp);
 app.post("/api/users", handlerCreateUser);
 app.put("/api/users", handlerPutUser);
+app.post("/api/polka/webhooks", handlerSetChirpyRed);
 
 app.get("/admin/metrics", handlerMetrics);
 app.post("/admin/reset", handlerReset);

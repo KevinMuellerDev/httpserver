@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { createUser, updateUser } from "../db/queries/users.js";
+import { createUser, updateUser, updateUserChirpyRed } from "../db/queries/users.js";
 import { getBearerToken, hashPassword, validateJWT } from "./auth.js";
-import { BadRequestError, UnauthorizedError } from "./errors.js";
+import { BadRequestError, NotFoundError, UnauthorizedError } from "./errors.js";
 import { config } from "../config.js";
 
 

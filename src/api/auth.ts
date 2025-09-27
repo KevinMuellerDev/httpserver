@@ -76,6 +76,15 @@ export const getBearerToken = (req: Request): string => {
     return bearer
 }
 
+export const getAPIKey = (req: Request): string => {
+    const key = req.get('Authorization')?.split(' ')[1];
+
+    if (!key)
+        throw new UnauthorizedError('')
+
+    return key
+}
+
 export const makeRefreshToken = async (id: string) => {
     const randString = randomBytes(256).toString('hex');
     const expirationInMs = new Date().getTime() + daysToMilliseconds(config.jwt.ttl);

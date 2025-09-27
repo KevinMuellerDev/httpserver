@@ -1,4 +1,4 @@
-import { MigrationConfig } from "drizzle-orm/migrator";
+import type { MigrationConfig } from "drizzle-orm/migrator";
 
 type Config = {
   api: APIConfig;
@@ -10,6 +10,7 @@ type APIConfig = {
   fileserverHits: number;
   port: number;
   platform: string;
+  polka_key: string;
 };
 
 type DBConfig = {
@@ -40,6 +41,7 @@ export const config: Config = {
     fileserverHits: 0,
     port: Number(getEnvOrThrow("PORT")),
     platform: getEnvOrThrow("PLATFORM"),
+    polka_key: getEnvOrThrow("POLKA_KEY")
   },
   db: {
     url: getEnvOrThrow("DB_URL"),
